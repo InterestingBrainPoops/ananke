@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "board"
+]
+
+[profile.bench]
+debug = true
