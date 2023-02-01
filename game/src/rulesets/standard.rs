@@ -74,6 +74,7 @@ impl Ruleset for Standard {
             offset_positions.shuffle(&mut self.rng);
             for (id, place) in places.iter().cloned().enumerate() {
                 out.snakes.push(Snake {
+                    alive: true,
                     id,
                     health: 100,
                     body: (0..4).map(|_| place.clone()).collect::<Vec<Coordinate>>(),
@@ -115,7 +116,7 @@ impl Ruleset for Standard {
         // feed each snake
         let board = shared::feed_snakes(board);
 
-        // remove each snake
+        // remove eliminations
         let board = shared::eliminate_snakes(board);
         Ok(board)
     }

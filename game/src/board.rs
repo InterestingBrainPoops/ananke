@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::{num, ops::AddAssign};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Coordinate {
@@ -21,6 +21,7 @@ impl AddAssign for Coordinate {
 
 #[derive(Clone)]
 pub struct Snake {
+    pub alive: bool,
     pub id: usize,
     pub health: i32,
     pub body: Vec<Coordinate>,
@@ -36,7 +37,16 @@ pub struct Board {
 }
 
 impl Board {
+    pub fn num_alive(&self) -> usize {
+        return self
+            .snakes
+            .iter()
+            .map(|snake| if snake.alive { 1 } else { 0 })
+            .sum::<usize>();
+    }
     pub fn game_over(&self) -> bool {
-        todo!();
+        let num_alive = self.num_alive();
+
+        return num_alive == 1 || num_alive == 0;
     }
 }
