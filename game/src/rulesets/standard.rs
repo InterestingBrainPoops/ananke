@@ -116,8 +116,13 @@ impl Ruleset for Standard {
         // feed each snake
         let board = shared::feed_snakes(board);
 
+        // place food
+        // https://github.com/BattlesnakeOfficial/rules/blob/main/cli/commands/play.go#L114 for spawn rate
+        let board = shared::place_food_random(board, &mut self.rng, 15, 1);
+
         // remove eliminations
         let board = shared::eliminate_snakes(board);
+
         Ok(board)
     }
 }

@@ -1,3 +1,5 @@
+use rand::prelude::*;
+
 use crate::{
     board::{Board, Coordinate},
     ruleset::{Direction, Move},
@@ -84,6 +86,39 @@ pub fn eliminate_snakes(mut board: Board) -> Board {
     }
     for x in eliminations {
         board.snakes[x].alive = false;
+    }
+    board
+}
+
+/// Places food on the board
+/// if there are less than the provided minimum food, it will place one randomly on the board.
+/// if there is enough food, it will use the provided chance % to place a food.
+/// These are mutually exclusive actions.
+
+pub fn place_food_random(mut board: Board, rng: &mut ThreadRng, chance: u8, min_food: u8) -> Board {
+    let mut food_positions: Vec<Coordinate> = (0..board.width)
+        .flat_map(|x| (0..board.height).map(move |y| Coordinate::new(x, y)))
+        .filter(|x| board.snakes.iter().any(|y| y.body.contains(x)) || board.food.contains(x))
+        .collect();
+    food_positions.shuffle(rng);
+    if board.food.len() < min_food as usize {
+        while board.food.len() < min_food as usize {
+            if let Some(food) = food_positions.pop() {
+                // if there is a food to add, add it
+                board.food.push(food);
+            } else {
+                // if there are no open food spots, don't add and just return
+                return board;
+            }
+        }
+    } else if rng.gen_bool(chance as f64 / 100.0) {
+        if let Some(food) = food_positions.pop() {
+            // if there is a food to add, add it
+            board.food.push(food);
+        } else {
+            // if there are no open food spots, don't add and just return
+            return board;
+        }
     }
     board
 }
