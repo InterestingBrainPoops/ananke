@@ -1,0 +1,11 @@
+[package]
+name = "temporaldiff"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+eval = {path = "../eval"}
+game = {path = "../game"}
+vecmath = {path = "../vecmath"}

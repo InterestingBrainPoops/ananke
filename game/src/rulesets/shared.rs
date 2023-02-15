@@ -69,7 +69,7 @@ pub fn eliminate_snakes(mut board: Board) -> Board {
         if board
             .snakes
             .iter()
-            .any(|x| x.alive && x.body[1..].contains(&head))
+            .any(|x| x.id != snake.id && x.alive && x.body[1..].contains(&head))
         {
             eliminations.push(snake.id);
             continue;
@@ -78,7 +78,7 @@ pub fn eliminate_snakes(mut board: Board) -> Board {
         if board
             .snakes
             .iter()
-            .any(|x| x.alive && x.body[0] == head && x.body.len() >= length)
+            .any(|x| x.id != snake.id && x.alive && x.body[0] == head && x.body.len() >= length)
         {
             eliminations.push(snake.id);
             continue;

@@ -1,9 +1,9 @@
-use crate::board::Board;
+use crate::board::{Board, SnakeID};
 
 #[derive(Clone, Copy)]
 pub struct Move {
     pub direction: Direction,
-    pub id: usize,
+    pub id: SnakeID,
 }
 
 #[derive(Clone, Copy)]

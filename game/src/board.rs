@@ -1,9 +1,25 @@
-use std::{num, ops::AddAssign};
+use std::{
+    num,
+    ops::{Add, AddAssign},
+};
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub type SnakeID = usize;
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Coordinate {
     pub x: i32,
     pub y: i32,
+}
+
+impl Add<Coordinate> for Coordinate {
+    type Output = Coordinate;
+
+    fn add(self, rhs: Coordinate) -> Self::Output {
+        Coordinate {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
 }
 
 impl Coordinate {
@@ -19,15 +35,15 @@ impl AddAssign for Coordinate {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Snake {
     pub alive: bool,
-    pub id: usize,
+    pub id: SnakeID,
     pub health: i32,
     pub body: Vec<Coordinate>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Board {
     pub width: i32,
     pub height: i32,
