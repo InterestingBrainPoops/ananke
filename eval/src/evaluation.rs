@@ -71,7 +71,7 @@ impl Eval<4> for AreaControlEval {
         if board
             .snakes
             .iter()
-            .any(|x| x.alive && x.id != you && x.body.len() > you_snake.body.len())
+            .any(|x| x.alive && x.id != you && x.body.len() >= you_snake.body.len())
         {
             distance_to_other *= -1.0;
         }

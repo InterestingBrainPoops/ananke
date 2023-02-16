@@ -74,7 +74,7 @@ fn TDL<const N: usize, E: Eval<N>, R: Ruleset>(
             x = x_prime;
         }
         {
-            if episode_num % 1 == 0 {
+            if false && episode_num % 1 == 0 {
                 let num_test = 1000;
 
                 let mut num_wins = Arc::new(Mutex::<i32>::new(0));
@@ -134,7 +134,7 @@ fn sigmoid(x: f64) -> f64 {
 fn main() {
     let inital_weights = Vector::<4>::new(1.0);
     let ruleset = Standard::new(2);
-    let out_weights = TDL::<4, AreaControlEval, Standard>(inital_weights, ruleset, 500, 500);
+    let out_weights = TDL::<4, AreaControlEval, Standard>(inital_weights, ruleset, 1500, 500);
     println!("{:?}", out_weights.0);
     for x in 0..out_weights.1.game_length.len() {
         // println!(

@@ -3,9 +3,11 @@ use std::{
     ops::{Add, AddAssign},
 };
 
+use serde::Deserialize;
+
 pub type SnakeID = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize)]
 pub struct Coordinate {
     pub x: i32,
     pub y: i32,
