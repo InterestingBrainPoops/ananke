@@ -1,3 +1,5 @@
+use std::f64::consts::E;
+
 use game::{
     board::Coordinate,
     ruleset::{Direction, Move},
@@ -118,7 +120,7 @@ impl Eval<4> for AreaControlEval {
                     x.health -= 1;
                 }
             }
-            x.2 = Self::eval(&new_board, you).dot(weights);
+            x.2 = sigmoid(Self::eval(&new_board, you).dot(weights));
         }
         if new_possible.len() == 0 {
             return Move {
@@ -139,4 +141,7 @@ impl Eval<4> for AreaControlEval {
 
 fn manhattan_dist(c1: Coordinate, c2: Coordinate) -> i32 {
     (c1.x - c2.x).abs() + (c1.y - c2.y).abs()
+}
+fn sigmoid(x: f64) -> f64 {
+    1.0 / (1.0 + E.powf(-x))
 }

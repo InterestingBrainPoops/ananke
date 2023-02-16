@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "game", "eval", "temporaldiff", "vecmath", "tester"
+    "game", "eval", "temporaldiff", "vecmath", "tester", "snake_server"
 ]
 
 [profile.bench]

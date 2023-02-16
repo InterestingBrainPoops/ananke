@@ -1,10 +1,14 @@
-use std::f64::consts::E;
+use std::{
+    f64::consts::E,
+    sync::{Arc, Mutex},
+};
 
 use eval::{evaluation::AreaControlEval, Eval};
 use game::{
-    ruleset::{Move, Ruleset},
+    ruleset::{self, Move, Ruleset},
     rulesets::standard::Standard,
 };
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use vecmath::Vector;
 struct Stats {
     game_length: Vec<f64>,
@@ -42,7 +46,7 @@ fn TDL<const N: usize, E: Eval<N>, R: Ruleset>(
                 .iter()
                 .map(|x| {
                     if x.id != you_id {
-                        E::get_move(&state, x.id, first_weights)
+                        E::get_move(&state, x.id, old_weights)
                     } else {
                         E::get_move(&state, x.id, weights)
                     }
@@ -70,40 +74,55 @@ fn TDL<const N: usize, E: Eval<N>, R: Ruleset>(
             x = x_prime;
         }
         {
-            if episode_num % 100 == 0 {
+            if episode_num % 1 == 0 {
                 let num_test = 1000;
-                let mut num_wins = 0;
-                let mut total_length = 0;
-                for _ in 0..num_test {
+
+                let mut num_wins = Arc::new(Mutex::<i32>::new(0));
+                let mut total_length = Arc::new(Mutex::<i32>::new(0));
+                (0..num_test).into_par_iter().for_each(|_| {
+                    let mut rule = Standard::new(2);
                     let mut length = 1;
-                    let mut state = ruleset.initialize_board();
-                    while (!state.game_over()) {
+                    let mut state = rule.initialize_board();
+                    while !state.game_over() {
                         length += 1;
                         let moves = state
                             .snakes
                             .iter()
                             .map(|x| {
                                 if x.id != you_id {
-                                    E::get_move(&state, x.id, first_weights)
+                                    E::get_move(&state, x.id, old_weights)
                                 } else {
                                     E::get_move(&state, x.id, weights)
                                 }
                             })
                             .collect::<Vec<Move>>();
 
-                        state = ruleset.step_board(moves, state).unwrap();
+                        state = rule.step_board(moves, state).unwrap();
                     }
                     if let Some(x) = state.snakes.iter().find(|x| x.alive) {
                         if x.id == you_id {
-                            num_wins += 1;
+                            let mut num_wins = num_wins.lock().unwrap();
+                            *num_wins += 1;
                         }
                     }
-                    total_length += length;
-                }
+                    {
+                        let mut total_length = total_length.lock().unwrap();
+                        *total_length += length;
+                    }
+                });
+
                 stats
                     .game_length
-                    .push(total_length as f64 / num_test as f64);
-                stats.game_winrate.push(num_wins as f64 / num_test as f64);
+                    .push(*total_length.lock().unwrap() as f64 / num_test as f64);
+                stats
+                    .game_winrate
+                    .push(*num_wins.lock().unwrap() as f64 / num_test as f64);
+                println!(
+                    "{}, {}, {}",
+                    episode_num,
+                    stats.game_length.last().unwrap(),
+                    stats.game_winrate.last().unwrap() * 100.0
+                );
             }
         }
     }
@@ -115,12 +134,12 @@ fn sigmoid(x: f64) -> f64 {
 fn main() {
     let inital_weights = Vector::<4>::new(1.0);
     let ruleset = Standard::new(2);
-    let out_weights = TDL::<4, AreaControlEval, Standard>(inital_weights, ruleset, 50000, 50);
+    let out_weights = TDL::<4, AreaControlEval, Standard>(inital_weights, ruleset, 500, 500);
     println!("{:?}", out_weights.0);
     for x in 0..out_weights.1.game_length.len() {
-        println!(
-            "{}, {}",
-            out_weights.1.game_length[x], out_weights.1.game_winrate[x],
-        );
+        // println!(
+        //     "{}, {}",
+        //     out_weights.1.game_length[x], out_weights.1.game_winrate[x],
+        // );
     }
 }
